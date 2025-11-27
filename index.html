@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Tienda urbana - Pagos Seguros</title>
+<link rel="icon" href="https://img.freepik.com/fotos-premium/logotipo-simple-diseno-plano-tienda-vestidos-fiesta-ai-generativa_934475-4761.jpg">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    /* Filtro desplegable */
+    .filter-toggle {
+    background: #720347;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+    .filter-content {
+    display: none; /* Oculto al inicio */
+}
+    .filter-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;   /* Se asegura que quede a la izquierda */
+    gap: 5px;                       /* Pequeño espacio entre checkbox y texto */
+    margin-top: 10px;
+    width: fit-content;             /* Evita que se estire hacia la derecha */
+}
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #ffddea;
+    }
+    header {
+        background: #720347;
+        padding: 15px;
+        color: white;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+    }
+    .container {
+        width: 95%;
+        margin: 20px auto;
+    }
+
+    /* ----------------- INPUTS ARREGLADOS ----------------- */
+    input, select {
+        padding: 10px;
+        width: 100%;
+        margin-top: 5px;
+        border-radius: 6px;
+        border: 1px solid #bbb;
+        box-sizing: border-box;
+    }
+
+    .filters, .search-box {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+
+    .card-body {
+        padding: 10px;
+    }
+
+    .btn {
+        padding: 10px;
+        border: none;
+        margin-top: 8px;
+        width: 100%;
+        cursor: pointer;
+        border-radius: 6px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .btn-view { background: #007bff; }
+    .btn-cart { background: #28a745; }
+    .btn-disabled { background: #999; pointer-events: none; }
+
+    /* ---------------- AUTOCOMPLETE ---------------- */
+    #suggestions {
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-top: 5px;
+        max-height: 150px;
+        overflow-y: auto;
+        display: none;
+    }
+    #suggestions div {
+        padding: 10px;
+        cursor: pointer;
+    }
+    #suggestions div:hover {
+        background: #eee;
+    }
+
+    /* ---------------- MODAL ---------------- */
+    .modal-bg {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+    .modal {
+    background: white;
+    width: 90%;
+    max-width: 600px;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    max-height: 80vh; /* Limita alto */
+    overflow-y: auto; /* Activa desplazamiento */
+    }
+    .close-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    font-size: 22px;
+    background: #fff;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+}
+
+    /* ---------------- CARRITO FLOTANTE ---------------- */
+    #cart-panel {
+        position: fixed;
+        right: 15px;
+        bottom: 80px;
+        width: 300px;
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        display: none;
+    }
+
+    /* Botón de carrito flotante */
+    #cart-btn {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        background: #333;
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        font-size: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+</style>
+</head>
+<body>
+
+<header>Tienda urbana - Pagos Seguros</header>
+
+<div class="container">
+
+    <!-- BUSCADOR -->
+    <div class="search-box">
+        <label>Buscar productos:</label>
+        <input id="search" type="text" placeholder="Buscar por nombre...">
+        <div id="suggestions"></div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filters">
+    <div class="filter-toggle" onclick="toggleFilters()">
+        🔽 Filtros de productos
+    </div>
+
+    <div id="filter-content" class="filter-content">
+        <label>Categoría:</label>
+        <select id="filter-category">
+            <option value="todas">Todas</option>
+            <option value="ropa">Ropa</option>
+            <option value="accesorios">Accesorios</option>
+            <option value="coleccionables">Coleccionables</option>
+        </select>
+
+        <label>Precio mínimo:</label>
+        <input type="number" id="min-price" value="0">
+
+        <label>Precio máximo:</label>
+        <input type="number" id="max-price" value="999999">
+
+        <div class="filter-checkbox">
+            <input type="checkbox" id="only-available">
+            <span>Solo disponibles</span>
+        </div>
+    </div>
+</div>
+    <!-- PRODUCTOS -->
+    <div id="product-list" class="product-grid"></div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg">
+    <div class="modal">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        <h2 id="modal-title"></h2>
+        <img id="modal-img" style="width:100%;border-radius:6px;margin-top:10px;">
+        <p id="modal-price"></p>
+        <p id="modal-availability"></p>
+        <label>Tallas:</label>
+        <div id="modal-sizes"></div>
+
+        <h3>Reseñas</h3>
+        <div id="modal-reviews"></div>
+
+        <button class="btn btn-cart" onclick="addToCart(currentProduct)">Añadir al carrito</button>
+    </div>
+</div>
+
+<!-- PANEL DE CARRITO -->
+<div id="cart-panel">
+    <h3>Carrito</h3>
+    <div id="cart-items"></div>
+
+    <label>Email (notificaciones)</label>
+    <input id="email" type="text">
+
+    <label>Teléfono (SMS)</label>
+    <input id="phone" type="text">
+
+    <label>Método de pago:</label>
+    <select id="payment">
+        <option value="webpay">Webpay</option>
+        <option value="paypal">PayPal</option>
+        <option value="card">Tarjeta de crédito</option>
+    </select>
+
+    <button class="btn btn-view" onclick="checkout(); enviarCorreoEmailJS();">Pagar</button>
+
+
+    <h4>Notificaciones:</h4>
+    <div id="notifications"></div>
+</div>
+
+<!-- BOTÓN FLOAT DE CARRITO -->
+<div id="cart-btn" onclick="toggleCart()">🛒</div>
+
+<script>
+/* --------------------------- PRODUCTOS --------------------------- */
+const products = [
+    { id:1, title:"Blusa Floral", category:"ropa", price:12990, available:true, sizes:["S","M","L"], img:"https://tse2.mm.bing.net/th/id/OIP.YBHHrHSWULw2PxhwZZwxkwHaJ3?rs=1&pid=ImgDetMain&o=7&rm=3", reviews:[{user:"Ana", rating:5, comment:"Muy linda y cómoda"}] },
+    { id:2, title:"Cartera Elegance", category:"accesorios", price:34990, available:true, sizes:[], img:"https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/837d7bb5b66cf830d422cc47a9385402.jpg?imageView2/2/w/368/q/80/format/webp", reviews:[{user:"Vale", rating:4, comment:"Muy buena calidad"}] },
+    { id:3, title:"Gorro de Lana Rosa", category:"ropa", price:7990, available:false, sizes:["Única"], img:"https://i.etsystatic.com/26199857/r/il/ec0a7d/6045283771/il_300x300.6045283771_9ubg.jpg", reviews:[] },
+    
+    { id:4, title:"Vestido Casual Rosa", category:"ropa", price:19990, available:true, 
+  sizes:["S","M","L"], 
+  img:"https://i.pinimg.com/originals/4c/09/52/4c09527e1e878277a5bf1183f8255198.png",
+  reviews:[{user:"Daniela", rating:5, comment:"Perfecto para el verano"}] 
+},
+
+{ id:5, title:"Pantalón Skinny Negro", category:"ropa", price:15990, available:true, 
+  sizes:["XS","S","M","L"], 
+  img:"https://assets.closeando.com/assets/products/578eaf840f6421b4e62c252c0f455cb7/Yg519doMSaTNd4THlSlrqUW3AcPIEssjdCm0WMjY.jpg",
+  reviews:[{user:"Javiera", rating:4, comment:"Calce muy cómodo"}] 
+},
+
+{ id:6, title:"Polera Oversize Blanca", category:"ropa", price:9990, available:true,
+  sizes:["S","M","L","XL"], 
+  img:"https://tshop.r10s.com/32a/e6d/507e/480d/d0fb/2b9b/833d/11d2ecb1fd0242ac110002.jpg?_ex=486x486",
+  reviews:[{user:"Monse", rating:5, comment:"Muy suave y combina con todo"}] 
+},
+
+{ id:7, title:"Chaqueta Denim Mujer", category:"ropa", price:26990, available:false,
+  sizes:["S","M","L"], 
+  img:"https://qafacol.vteximg.com.br/arquivos/ids/266246-1000-1000/40080079-5787_1.jpg?v=636885225637770000",
+  reviews:[] 
+},
+
+{ id:8, title:"Falda Plisada Negra", category:"ropa", price:13990, available:true, 
+  sizes:["S","M","L"], 
+  img:"https://m1.paperblog.com/i/636/6361145/falda-plisada-negra-corta-L-vJ8qjQ.jpeg",
+  reviews:[{user:"Fernanda", rating:5, comment:"Muy elegante y cómoda"}] 
+},
+
+];
+
+const productList = document.getElementById("product-list");
+const search = document.getElementById("search");
+const suggestions = document.getElementById("suggestions");
+
+let currentProduct = null;
+
+/* --------------------- RENDER PRODUCTOS --------------------- */
+function toggleFilters() {
+    const box = document.getElementById("filter-content");
+    box.style.display = box.style.display === "block" ? "none" : "block";
+}
+
+function renderProducts() {
+    productList.innerHTML = "";
+
+    const category = document.getElementById("filter-category").value;
+    const minPrice = Number(document.getElementById("min-price").value);
+    const maxPrice = Number(document.getElementById("max-price").value);
+    const onlyAvailable = document.getElementById("only-available").checked;
+    const query = search.value.toLowerCase();
+
+    products
+        .filter(p=> (category==="todas" || p.category===category))
+        .filter(p=> p.price >= minPrice && p.price <= maxPrice)
+        .filter(p=> onlyAvailable ? p.available : true)
+        .filter(p=> p.title.toLowerCase().includes(query))
+        .forEach(p => {
+            productList.innerHTML += `
+                <div class="card">
+                    <img src="${p.img}">
+                    <div class="card-body">
+                        <h3>${p.title}</h3>
+                        <p>$${p.price}</p>
+                        <button class="btn btn-view" onclick="openModal(${p.id})">Ver</button>
+                        <button class="btn ${p.available?'btn-cart':'btn-disabled'}" onclick="addToCart(${p.id})">Añadir</button>
+                    </div>
+                </div>
+            `;
+        });
+}
+
+renderProducts();
+
+/* ---------------- AUTOCOMPLETE ---------------- */
+search.addEventListener("input", ()=> {
+    const q = search.value.toLowerCase();
+    if (!q) return suggestions.style.display = "none";
+
+    const matches = products.filter(p=>p.title.toLowerCase().includes(q)).slice(0,5);
+
+    suggestions.innerHTML = "";
+    matches.forEach(m=>{
+        const div = document.createElement("div");
+        div.textContent = m.title;
+        div.onclick = ()=>{
+            search.value = m.title;
+            suggestions.style.display = "none";
+            renderProducts();
+        };
+        suggestions.appendChild(div);
+    });
+
+    suggestions.style.display = matches.length ? "block":"none";
+});
+
+/* ---------------- MODAL PRODUCTO ---------------- */
+function openModal(id) {
+    const p = products.find(prod=>prod.id === id);
+    currentProduct = id;
+
+    document.getElementById("modal-title").innerText = p.title;
+    document.getElementById("modal-img").src = p.img;
+    document.getElementById("modal-price").innerText = "Precio: $" + p.price;
+    document.getElementById("modal-availability").innerText = p.available ? "Disponible" : "Agotado";
+
+    // Tallas
+    const sizeBox = document.getElementById("modal-sizes");
+    sizeBox.innerHTML = p.sizes.length ? p.sizes.map(s=>`<button>${s}</button>`).join("") : "Sin tallas";
+
+    // Reseñas
+    const revBox = document.getElementById("modal-reviews");
+    revBox.innerHTML = p.reviews.length ?
+        p.reviews.map(r=>`<p><strong>${r.user}</strong>: ${r.comment}</p>`).join("") :
+        "Sin reseñas";
+
+    document.getElementById("modal-bg").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("modal-bg").style.display = "none";
+}
+
+/* ---------------- CARRITO ---------------- */
+let cart = [];
+
+function addToCart(id) {
+    const p = products.find(prod=>prod.id===id);
+
+    const found = cart.find(item=>item.id === id);
+    if (found) found.qty++;
+    else cart.push({ id:p.id, title:p.title, price:p.price, qty:1 });
+
+    renderCart();
+}
+
+function renderCart() {
+    const box = document.getElementById("cart-items");
+    box.innerHTML = cart.length ? "" : "<p>Carrito vacío</p>";
+
+    cart.forEach(item=>{
+        box.innerHTML += `
+            <div>
+                ${item.title} — ${item.qty}u
+            </div>
+        `;
+    });
+}
+
+/* ---------------- CHECKOUT ---------------- */
+function checkout() {
+    if (cart.length===0) return notify("Carrito vacío.");
+
+    const method = document.getElementById("payment").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+
+    notify("Orden creada. Pagando con: " + method.toUpperCase());
+
+    setTimeout(()=> notify("Pago aprobado"), 2000);
+    setTimeout(()=> notify("Pedido en camino"), 5000);
+    setTimeout(()=> notify("Pedido entregado"), 9000);
+
+    if (email) console.log("Enviar correo a:", email);
+    if (phone) console.log("Enviar SMS a:", phone);
+}
+
+/* ---------------- PANEL CARRITO ---------------- */
+function toggleCart() {
+    const panel = document.getElementById("cart-panel");
+    panel.style.display = (panel.style.display === "none" || panel.style.display === "") ? "block" : "none";
+}
+
+/* ---------------- NOTIFICACIONES ---------------- */
+function notify(msg) {
+    const box = document.getElementById("notifications");
+    box.innerHTML = `<div>${msg}</div>` + box.innerHTML;
+}
+
+</script>
+<!-- EMAILJS -->
+<script type="module">
+    import emailjs from 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+
+    // Inicializar EmailJS
+    emailjs.init("nQs75mmh9_vC2Ihz-");
+
+    window.enviarCorreoEmailJS = function () {
+
+        const email = document.getElementById("email").value;
+
+        if (!email) {
+            alert("Por favor ingresa un correo.");
+            return;
+        }
+
+        if (cart.length === 0) {
+            alert("Tu carrito está vacío.");
+            return;
+        }
+
+        const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+        const producto = cart[0];
+
+        emailjs.send("service_36n7ksb", "template_vnc46rf", {
+            customer_email: email,
+            order_status: "Pedido confirmado 💖",
+            product_name: producto.title,
+            product_qty: producto.qty,
+            product_price: producto.price,
+            order_total: total,
+            order_date: new Date().toLocaleString()
+        })
+        .then(() => {
+            alert("📩 ¡Correo enviado correctamente!");
+        })
+        .catch((err) => {
+            console.error("EMAILJS ERROR:", err);
+            alert("❌ Error al enviar correo: " + err.text);
+        });
+    };
+</script>
+
+</body>
+</html>
