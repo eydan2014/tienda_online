@@ -275,24 +275,94 @@
 
 /* PRODUCTOS */
 const products = [
-    { id:1, title:"Blusa Floral", category:"ropa", price:12990, available:true, sizes:["S","M","L"], img:"https://tse2.mm.bing.net/th/id/OIP.YBHHrHSWULw2PxhwZZwxkwHaJ3?rs=1&pid=ImgDetMain&o=7&rm=3", reviews:[{user:"Ana", rating:5, comment:"Muy linda"}] },
+    { 
+        id: 1, 
+        title: "Blusa Floral", 
+        category: "ropa", 
+        price: 12990, 
+        available: true, 
+        sizes: ["S","M","L"], 
+        img: "https://tse2.mm.bing.net/th/id/OIP.YBHHrHSWULw2PxhwZZwxkwHaJ3?rs=1&pid=ImgDetMain&o=7&rm=3", 
+        reviews: [{ user: "Ana", rating: 5, comment: "Muy linda y cómoda" }] 
+    },
 
-    { id:2, title:"Cartera Elegance", category:"accesorios", price:34990, available:true, sizes:[], img:"https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/837d7bb5b66cf830d422cc47a9385402.jpg?imageView2/2/w/368/q/80/format/webp", reviews:[{user:"Vale", rating:4, comment:"Excelente"}] },
+    { 
+        id: 2, 
+        title: "Cartera Elegance", 
+        category: "accesorios", 
+        price: 34990, 
+        available: true, 
+        sizes: [], 
+        img: "https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/837d7bb5b66cf830d422cc47a9385402.jpg?imageView2/2/w/368/q/80/format/webp", 
+        reviews: [{ user: "Vale", rating: 4, comment: "Muy buena calidad" }] 
+    },
 
-    { id:3, title:"Gorro Lana Rosa", category:"ropa", price:7990, available:false, sizes:["Única"], img:"https://i.etsystatic.com/26199857/r/il/ec0a7d/6045283771/il_300x300.6045283771_9ubg.jpg", reviews:[] },
+    { 
+        id: 3, 
+        title: "Gorro de Lana Rosa", 
+        category: "ropa", 
+        price: 7990, 
+        available: false, 
+        sizes: ["Única"], 
+        img: "https://i.etsystatic.com/26199857/r/il/ec0a7d/6045283771/il_300x300.6045283771_9ubg.jpg", 
+        reviews: [] 
+    },
 
-    { id:4, title:"Pantalón Skinny Mujer", category:"ropa", price:19990, available:true, sizes:["S","M","L"], img:"https://m.media-amazon.com/images/I/61INLvhfJRL._AC_UY300_.jpg", reviews:[{user:"Josefina", rating:5, comment:"Calce perfecto"}] },
+    { 
+        id: 4, 
+        title: "Vestido Casual Rosa", 
+        category: "ropa", 
+        price: 19990, 
+        available: true,
+        sizes: ["S","M","L"], 
+        img: "https://i.pinimg.com/originals/4c/09/52/4c09527e1e878277a5bf1183f8255198.png",
+        reviews: [{ user: "Daniela", rating: 5, comment: "Perfecto para el verano" }]
+    },
 
-    { id:5, title:"Chaqueta Suave Beige", category:"ropa", price:29990, available:true, sizes:["XS","S","M"], img:"https://m.media-amazon.com/images/I/61rKDdpTJXL._AC_UY300_.jpg", reviews:[{user:"Flor", rating:4, comment:"Muy calentita"}] },
+    { 
+        id: 5, 
+        title: "Pantalón Skinny Negro", 
+        category: "ropa", 
+        price: 15990, 
+        available: true,
+        sizes: ["XS","S","M","L"], 
+        img: "https://assets.closeando.com/assets/products/578eaf840f6421b4e62c252c0f455cb7/Yg519doMSaTNd4THlSlrqUW3AcPIEssjdCm0WMjY.jpg",
+        reviews: [{ user: "Javiera", rating: 4, comment: "Calce muy cómodo" }]
+    },
 
-    { id:6, title:"Polera Rosa Pastel", category:"ropa", price:9990, available:true, sizes:["S","M","L"], img:"https://m.media-amazon.com/images/I/61Z5Y+3CX8L._AC_UY300_.jpg", reviews:[] }
+    { 
+        id: 6, 
+        title: "Polera Oversize Blanca", 
+        category: "ropa", 
+        price: 9990, 
+        available: true,
+        sizes: ["S","M","L","XL"], 
+        img: "https://tshop.r10s.com/32a/e6d/507e/480d/d0fb/2b9b/833d/11d2ecb1fd0242ac110002.jpg?_ex=486x486",
+        reviews: [{ user: "Monse", rating: 5, comment: "Muy suave y combina con todo" }]
+    },
+
+    { 
+        id: 7, 
+        title: "Chaqueta Denim Mujer", 
+        category: "ropa", 
+        price: 26990, 
+        available: false,
+        sizes: ["S","M","L"], 
+        img: "https://qafacol.vteximg.com.br/arquivos/ids/266246-1000-1000/40080079-5787_1.jpg?v=636885225637770000",
+        reviews: [] 
+    },
+
+    { 
+        id: 8, 
+        title: "Falda Plisada Negra", 
+        category: "ropa", 
+        price: 13990, 
+        available: true,
+        sizes: ["S","M","L"], 
+        img: "https://m1.paperblog.com/i/636/6361145/falda-plisada-negra-corta-L-vJ8qjQ.jpeg",
+        reviews: [{ user: "Fernanda", rating: 5, comment: "Muy elegante y cómoda" }] 
+    }
 ];
-
-const productList = document.getElementById("product-list");
-const search = document.getElementById("search");
-const suggestions = document.getElementById("suggestions");
-
-let currentProduct = null;
 
 /* RENDER PRODUCTOS */
 function renderProducts() {
@@ -475,3 +545,4 @@ ${new Date().toLocaleString()}`
 
 </body>
 </html>
+
