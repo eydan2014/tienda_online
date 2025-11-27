@@ -363,7 +363,11 @@ const products = [
         reviews: [{ user: "Fernanda", rating: 5, comment: "Muy elegante y cómoda" }] 
     }
 ];
+const productList = document.getElementById("product-list");
+const search = document.getElementById("search");
+const suggestions = document.getElementById("suggestions");
 
+let currentProduct = null;
 /* RENDER PRODUCTOS */
 function renderProducts() {
     productList.innerHTML = "";
@@ -545,4 +549,5 @@ ${new Date().toLocaleString()}`
 
 </body>
 </html>
+
 
